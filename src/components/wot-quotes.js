@@ -4,45 +4,45 @@ import { wotMachine } from './machine'
 
 export default ({
   children: WrappedComponent,
-  credit = null,
-  limit = null,
-  random = false,
+  url = `https://sbardian.api.stdlib.com/wotQuotes@0.0.1/?random=true`,
 }) => {
-  const [state, send] = useMachine(wotMachine)
-  const [data, setData] = React.useState({ quotes: [] })
+  const [state, send] = useMachine(wotMachine, {
+    actions: {
+      fetchData: async () => {
+        const response = await fetch(`${url}`)
+        console.log('response', response)
 
-  let fetchUrl = ''
-  if (credit && limit) {
-    fetchUrl = `https://sbardian.api.stdlib.com/wotQuotes@0.0.1/?credit=${credit}&limit=${limit}`
-  }
-  if (credit && !limit) {
-    fetchUrl = `https://sbardian.api.stdlib.com/wotQuotes@0.0.1/?credit=${credit}`
-  }
-  if (limit && !credit) {
-    fetchUrl = `https://sbardian.api.stdlib.com/wotQuotes@0.0.1/?limit=${limit}`
-  }
-  if (random && !credit && !limit) {
-    fetchUrl = `https://sbardian.api.stdlib.com/wotQuotes@0.0.1/?random=true`
+        if (response.status === 200) {
+          const quotes = await response.json()
+          send({ type: 'RESOLVE', data: quotes })
+        } else {
+          send('REJECT')
+          send('RETRY')
+        }
+      },
+    },
+    services: {
+      testService: (context, event) => {
+        console.log(event.type, ': im am the testService!: ', context)
+        return new Promise((resolve, reject) =>
+          resolve({ blah: 'test service resolved', something: 20 }),
+        )
+      },
+    },
+  })
+
+  const resetFetch = () => {
+    send('RESET')
+    send('FETCH')
   }
 
   React.useEffect(() => {
-    fetch(`${fetchUrl}`)
-      .then((response, err) => {
-        send('FETCH')
-        if (err) {
-          send('REJECT')
-        }
-        return response.json()
-      })
-      .then(myJson => {
-        setData(myJson)
-        send('RESOLVE')
-      })
-  }, [])
+    send('FETCH')
+  }, [url, send])
 
   const bag = {
     state,
-    data,
+    resetFetch,
   }
 
   return <WrappedComponent {...bag} />
