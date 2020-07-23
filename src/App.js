@@ -40,6 +40,8 @@ function App() {
                   </button>{' '}
                 </div>
               )
+
+            // handle multiple quotes
             if (
               state.value === 'success' &&
               state?.context?.data?.quotes?.length > 0
@@ -49,7 +51,7 @@ function App() {
               } = state
               return (
                 <div style={{ maxWidth: '800px', margin: '20px' }}>
-                  {data.quotes.map(quote => {
+                  {data.quotes.map((quote) => {
                     return (
                       <div
                         key={quote.id}
@@ -72,6 +74,8 @@ function App() {
                 </div>
               )
             }
+
+            // handle single quotes
             if (
               state.value === 'success' &&
               state.context.data &&
