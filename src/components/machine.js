@@ -28,44 +28,6 @@ export const wotMachine = Machine(
             target: 'failure',
           },
         },
-        invoke: [
-          {
-            id: 'getUserService1',
-            src: 'getUser',
-            onDone: {
-              actions: (context, event) =>
-                console.log(event.type, ': service done: ', event),
-            },
-            onError: {
-              actions: (context, event) =>
-                console.log(event.type, ': service error: ', event),
-            },
-          },
-          {
-            id: 'getUserService2',
-            src: 'getUser',
-            onDone: {
-              actions: (context, event) =>
-                console.log(event.type, ': service done: ', event),
-            },
-            onError: {
-              actions: (context, event) =>
-                console.log(event.type, ': service error: ', event),
-            },
-          },
-          {
-            id: 'testservice',
-            src: 'testService',
-            onDone: {
-              actions: (context, event) =>
-                console.log(event.type, ': service done: ', event),
-            },
-            onError: {
-              actions: (context, event) =>
-                console.log(event.type, ': service error: ', event),
-            },
-          },
-        ],
         entry: ['fetchData', 'logContext'],
       },
       success: {
@@ -101,12 +63,6 @@ export const wotMachine = Machine(
     },
   },
   {
-    services: {
-      getUser: (context, event) => {
-        console.log('im am src')
-        return new Promise((resolve, reject) => resolve(20))
-      },
-    },
     actions: {
       logContext: (context, event) =>
         console.log('event: ', event.type, ', context: ', context),
